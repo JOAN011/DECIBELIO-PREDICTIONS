@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  node_api:
+    build:
+      context: ./predictions-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MQTT_BROKER=mqtt://test.mosquitto.org
+      - MQTT_PORT=1883
+      - PG_HOST=db
+      - PG_PORT=5432
+      - PG_USER=admin
+      - PG_PASSWORD=admin123
+      - PG_DATABASE=prediccionesdb
+      - MODEL_API_URL=http://model_api:8000/predict
+    depends_on:
+      - db
+      - model_api
+    networks:
+      - app_network
+
+  model_api:
+    build:
+      context: ./model-api
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+    depends_on:
+      - db  # Solo si tu modelo necesita acceder a la BD
+
+  db:
+    image: postgres:15
+    container_name: predicciones_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: prediccionesdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - app_network
+    depends_on:
+      - db
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:
