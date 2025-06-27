@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 import numpy as np
 
 # Cargar el modelo de predicción
-model = load_model('/usr/src/app/mejor_modelo_transformer_final.h5')
+model = load_model('/app/mejor_modelo_transformer_final.h5')
 
 # Crear la aplicación FastAPI
 app = FastAPI()
