@@ -1,4 +1,4 @@
 fastapi
 uvicorn
-tensorflow==2.15.1  # Especifica la versión exacta que usaste para entrenar el modelo
+tensorflow-cpu==2.15.1
 paho-mqtt

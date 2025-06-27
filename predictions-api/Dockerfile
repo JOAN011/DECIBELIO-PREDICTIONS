@@ -1,17 +1,12 @@
-# Usar una imagen base de Node.js
-FROM node:16
+# Imagen optimizada y ligera de Node.js
+FROM node:16-alpine
 
-# Crear y establecer el directorio de trabajo
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copiar los archivos de la API
 COPY . .
 
-# Instalar dependencias
-RUN npm install
+RUN npm install --production
 
-# Exponer el puerto en el que el servidor escuchará
 EXPOSE 3000
 
-# Comando para iniciar la API de Node.js
 CMD ["node", "app.js"]
