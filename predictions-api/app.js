@@ -3,13 +3,16 @@ const mqtt = require('mqtt');
 const axios = require('axios');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const { guardarPrediccion, obtenerPredicciones, obtenerPrediccionesPorFecha } = require('./services/dbConection');
+const cors = require('cors');
 
+const { guardarPrediccion, obtenerPredicciones, obtenerPrediccionesPorFecha } = require('./services/dbConection');
 
 dotenv.config(); // Cargar variables desde .env
 
 const app = express();
 const port = 3000;
+
+app.use(cors()); 
 
 // Almacenes en memoria
 let mediciones = {};
