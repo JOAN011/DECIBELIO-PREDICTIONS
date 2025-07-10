@@ -1,5 +1,5 @@
 # ---------- base image ----------
-FROM python:3.11.3
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1 \
     TZ=America/Guayaquil

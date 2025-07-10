@@ -23,7 +23,7 @@ MODELS_DIR = BASE_DIR / "Model_LSTM"
 MODEL_INFO: Dict[str, Dict] = {
     "hour": dict(
         folder="1_hora_model",
-        file="lstm1h_optuna_model.keras",
+        file="lstm1h_optuna_model.h5",
         scaler="scaler1h.pkl",
         params="bestparams1h.pkl",
         resample_rule="1H",
@@ -32,7 +32,7 @@ MODEL_INFO: Dict[str, Dict] = {
     ),
     "6h": dict(
         folder="6_horas_model",
-        file="lstm_6h_optuna_bt.keras",
+        file="lstm_6h_optuna_bt.h5",
         scaler="scaler_6h.pkl",
         params="bestparams_6h.pkl",
         resample_rule="6H",
@@ -41,7 +41,7 @@ MODEL_INFO: Dict[str, Dict] = {
     ),
     "24h": dict(
         folder="24_horas_model",
-        file="lstm1h_24out_optuna.keras",
+        file="lstm1h_24out_optuna.h5",
         scaler="scaler1h_24out.pkl",
         params="bestparams1h_24out.pkl",
         resample_rule="1H",
@@ -50,7 +50,7 @@ MODEL_INFO: Dict[str, Dict] = {
     ),
     "30m": dict(
         folder="30_min_model",
-        file="lstm30_optuna_noBT.keras",
+        file="lstm30_optuna_noBT.h5",
         scaler="scaler30_noBT.pkl",
         params="bestparams30_noBT.pkl",
         resample_rule="30T",
@@ -59,7 +59,7 @@ MODEL_INFO: Dict[str, Dict] = {
     ),
     "week": dict(
         folder="1_semana_model",
-        file="lstm_daily7_model.keras",
+        file="lstm_daily7_model.h5",
         scaler="scaler_daily7.pkl",
         params="bestparams_daily7.pkl",
         resample_rule="1D",          # promedio diario
