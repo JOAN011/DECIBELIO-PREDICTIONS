@@ -13,6 +13,9 @@ from sklearn.preprocessing import MinMaxScaler
 from zoneinfo import ZoneInfo          
 LOCAL_TZ = ZoneInfo("America/Guayaquil")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 # -----------------------------------------------------------
 # CONFIG
 # -----------------------------------------------------------
@@ -93,6 +96,13 @@ ARTIFACTS = {tag: load_artifacts(tag) for tag in MODEL_INFO.keys()}
 # -----------------------------------------------------------
 app = FastAPI(title="Noise-LSTM API", version="1.1")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # o ["http://localhost:5000"] si sabes el puerto exacto del frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -----------------------------------------------------------
 # HELPERS
