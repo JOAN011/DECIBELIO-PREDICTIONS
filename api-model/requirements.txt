@@ -1,6 +1,6 @@
 fastapi>=0.111
 uvicorn[standard]>=0.29
-tensorflow==2.15.1         # trae keras 2.15 internamente
+tensorflow-cpu==2.15.1         # trae keras 2.15 internamente
 keras==2.15.0
 pandas>=2.2
 numpy>=1.26
