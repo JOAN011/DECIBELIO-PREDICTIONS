@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pg_mqtt
+    restart: always
+    environment:
+      POSTGRES_DB: mqttdb
+      POSTGRES_USER: mqttuser
+      POSTGRES_PASSWORD: mqttpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - mqtt_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_mqtt
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    networks:
+      - mqtt_network
+
+  nodeapp:
+    build: .
+    container_name: mqtt_microservice
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    networks:
+      - mqtt_network
+
+volumes:
+  pg_data:
+
+networks:
+  mqtt_network:
+    driver: bridge
