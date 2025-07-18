@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Literal, Dict
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -20,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # CONFIG
 # -----------------------------------------------------------
 BASE_DIR   = Path(__file__).resolve().parent
-DATA_PATH  = BASE_DIR / "data" / "datos_ruido_2025_final.csv"
+DATA_PATH  = Path("/app/data/datos_ruido_2025_final.csv")
 MODELS_DIR = BASE_DIR / "Model_LSTM"
 
 MODEL_INFO: Dict[str, Dict] = {
@@ -160,6 +161,32 @@ def predict_generic(tag: Literal["hour", "30m", "6h", "24h", "week"]):
 
     return {"model": tag, "timestamps": index, "predictions": preds}
 
+def predict_recursive(tag: Literal["hour", "30m", "6h"], steps: int):
+    model, scaler, n_past, cfg = ARTIFACTS[tag]
+    window, last_ts = load_latest_window(cfg["resample_rule"], n_past)
+    sequence = scaler.transform(window).reshape(1, n_past, 1)
+
+    preds = []
+    timestamps = []
+    ts = last_ts
+
+    for _ in range(steps):
+        pred_scaled = model.predict(sequence, verbose=0).reshape(-1, 1)
+        pred = scaler.inverse_transform(pred_scaled)[0][0]
+        preds.append(float(round(pred, 2)))
+
+        ts += timedelta(minutes=cfg["step_minutes"])
+        timestamps.append(ts.isoformat())
+
+        # Desliza la ventana hacia adelante con la nueva predicción
+        sequence = np.append(sequence[:, 1:, :], [[[pred_scaled[0][0]]]], axis=1)
+
+    return {
+        "model": tag,
+        "recursive_steps": steps,
+        "timestamps": timestamps,
+        "predictions": preds
+    }
 
 # -----------------------------------------------------------
 # ENDPOINTS
@@ -183,3 +210,13 @@ def predict(horizon: Literal["hour", "30m", "6h", "24h", "week"]):
       • /predict/week  – vector 7 d \n
     """
     return predict_generic(horizon)
+
+@app.get("/predict_recursive/{horizon}", tags=["predict"])
+def predict_recursively(horizon: Literal["hour", "30m", "6h"], steps: Optional[int] = 10):
+    """
+    Predicción recursiva – permite especificar cuántos pasos hacia adelante predecir.
+    Ej: /predict_recursive/hour?steps=12
+    """
+    if steps < 1 or steps > 100:
+        raise HTTPException(400, "steps debe estar entre 1 y 100")
+    return predict_recursive(horizon, steps)

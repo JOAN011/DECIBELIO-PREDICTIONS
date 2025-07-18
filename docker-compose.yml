@@ -1,70 +1,65 @@
 version: '3.8'
 
 services:
-  node_api:
+  postgres:
+    image: postgres:15-alpine
+    container_name: pg_mqtt
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mqttdb
+      POSTGRES_USER: mqttuser
+      POSTGRES_PASSWORD: mqttpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - mqtt_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  api-predictions:
     build:
-      context: ./predictions-api
+      context: ./api-predictions
+    container_name: mqtt_microservice
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - MQTT_BROKER=mqtt://test.mosquitto.org
-      - MQTT_PORT=1883
-      - PG_HOST=db
-      - PG_PORT=5432
-      - PG_USER=admin
-      - PG_PASSWORD=admin123
-      - PG_DATABASE=prediccionesdb
-      - MODEL_API_URL=http://model_api:8000/predict
+    volumes:
+      - ./shared:/app/shared:ro
     depends_on:
-      - db
-      - model_api
-    restart: unless-stopped
+      - postgres
+    networks:
+      - mqtt_network
     deploy:
       resources:
         limits:
-          memory: 200M
+          memory: 256M
           cpus: '0.5'
-    networks:
-      - app_network
 
-  model_api:
+  api-models:
     build:
-      context: ./model-api
+      context: ./api-model
+    container_name: model_api
+    restart: unless-stopped
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 350M
-          cpus: '0.6'
-    networks:
-      - app_network
-
-  db:
-    image: postgres:15
-    container_name: predicciones_db
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: prediccionesdb
     volumes:
-      - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - ./shared:/app/data:ro
+    networks:
+      - mqtt_network
     deploy:
       resources:
         limits:
-          memory: 300M
-          cpus: '0.4'
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
+          memory: 256M
+          cpus: '0.5'
 
 volumes:
-  db_data:
+  pg_data:
+
+networks:
+  mqtt_network:
+    driver: bridge

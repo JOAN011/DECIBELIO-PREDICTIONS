@@ -1,4 +1,0 @@
-fastapi
-uvicorn
-tensorflow-cpu==2.15.1
-paho-mqtt
