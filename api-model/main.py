@@ -10,6 +10,7 @@ import pandas as pd
 import tensorflow as tf
 import joblib
 from sklearn.preprocessing import MinMaxScaler
+from functools import lru_cache
 
 from zoneinfo import ZoneInfo          
 LOCAL_TZ = ZoneInfo("America/Guayaquil")
@@ -90,7 +91,10 @@ def load_artifacts(tag: str):
         n_past = 24 if tag == "hour" else 12
     return model, scaler, n_past, cfg
 
-ARTIFACTS = {tag: load_artifacts(tag) for tag in MODEL_INFO.keys()}
+
+@lru_cache(maxsize=None)
+def get_artifacts(tag: str):
+    return load_artifacts(tag)
 
 # -----------------------------------------------------------
 # FASTAPI
@@ -140,7 +144,7 @@ def load_latest_window(rule: str, n_past: int):
 
 
 def predict_generic(tag: Literal["hour", "30m", "6h", "24h", "week"]):
-    model, scaler, n_past, cfg = ARTIFACTS[tag]
+    model, scaler, n_past, cfg = get_artifacts(tag)
 
     # 1) prepara ventana más reciente
     window, last_ts = load_latest_window(cfg["resample_rule"], n_past)
@@ -162,7 +166,7 @@ def predict_generic(tag: Literal["hour", "30m", "6h", "24h", "week"]):
     return {"model": tag, "timestamps": index, "predictions": preds}
 
 def predict_recursive(tag: Literal["hour", "30m", "6h"], steps: int):
-    model, scaler, n_past, cfg = ARTIFACTS[tag]
+    model, scaler, n_past, cfg = get_artifacts(tag)
     window, last_ts = load_latest_window(cfg["resample_rule"], n_past)
     sequence = scaler.transform(window).reshape(1, n_past, 1)
 
