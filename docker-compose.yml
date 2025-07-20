@@ -46,7 +46,7 @@ services:
     container_name: model_api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "3006:8000"
     volumes:
       - ./shared:/app/data:ro # Keep this for now, but be aware
     networks:
