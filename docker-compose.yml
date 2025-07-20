@@ -48,14 +48,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./shared:/app/data:ro
+      - ./shared:/app/data:ro # Keep this for now, but be aware
     networks:
       - mqtt_network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
 
 volumes:
   pg_data:
