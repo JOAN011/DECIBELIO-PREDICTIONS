@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://40.76.118.59:3000', // Ajusta al puerto que uses
+        url: 'http://181.113.129.27:3000', // Ajusta al puerto que uses
       },
     ],
   },
