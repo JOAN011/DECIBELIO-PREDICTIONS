@@ -3,7 +3,7 @@ const mqtt = require('mqtt');
 const moment = require('moment');
 
 // Broker MQTT
-const BROKER_URL = 'tcp://test.mosquitto.org:1883';
+const BROKER_URL = 'tcp://181.113.129.26:1883';
 
 // ===== TOPICS MANAGEMENT =====
 const TOPICS_FILE = 'topics.json';
@@ -165,7 +165,7 @@ client.on('message', async (topic, message) => {
 const path = require('path');
 
 // Ruta absoluta del archivo CSV
-const CSV_FILE_PATH = path.join(__dirname, 'datos_sensores.csv');
+const CSV_FILE_PATH = path.join(__dirname, '../app/shared/datos_ruido_2025_final.csv');
 
 /**
  * @swagger
